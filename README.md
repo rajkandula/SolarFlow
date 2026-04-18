@@ -1,176 +1,386 @@
-# ☀️ Helios-Solar — Smart Energy Monitoring & Prediction
+# ☀️ SolarFlow — Solar Installation Management Platform
 
-<p align="center">
-  <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" width="100%" alt="Solar Energy Banner" />
-</p>
-
-<p align="center">
-  <b>End-to-end monitoring + forecasting for photovoltaic (PV) systems.</b><br/>
-  Real-time sensor telemetry, weather correlation, and ML-driven generation prediction.
-</p>
-
-<p align="center">
-  <a href="#-system-design">System Design</a> •
-  <a href="#-project-summary">Summary</a> •
-  <a href="#-features">Features</a> •
-  <a href="#-technology-stack">Tech Stack</a> •
-  <a href="#-hardware-architecture-optional">Hardware</a> •
-  <a href="#-getting-started">Getting Started</a> •
-  <a href="#-roadmap">Roadmap</a> •
-  <a href="#-license">License</a>
-</p>
+> A full-stack project management platform for solar installation companies. Customers order solar panels, sales reps approve & assign jobs, construction crews execute installs, and managers oversee everything end-to-end.
 
 ---
 
-## 🧩 System Design
+## 🚀 Project Name
 
-### High-level Architecture
-
-<img width="1024" height="1024" alt="Gemini_Generated_Image_zamxrozamxrozamx" src="https://github.com/user-attachments/assets/46df0531-dd6b-4d03-a016-e8c103a96350" />
-
-
-
-### Data Flow
-
-1. **Sensors** measure PV telemetry (V, A, temperature, light, etc.) on a microcontroller.
-2. Device publishes readings to an **MQTT broker** (topic-based streaming).
-3. **Ingestion service** subscribes to topics, validates payloads, and writes points into **InfluxDB**.
-4. **FastAPI** serves aggregated metrics and recent telemetry to the dashboard.
-5. **Weather service** pulls OpenWeatherMap signals (cloud cover, UV index, etc.) and stores/correlates them.
-6. **Forecasting job** trains/updates a simple model (e.g., linear regression) to predict next-day generation.
-7. **Alerting** triggers notifications on fault patterns or efficiency drops.
-
-### Key Design Choices
-
-- **Time-series database (InfluxDB):** fast writes + efficient downsampling and range queries.
-- **MQTT:** lightweight, reliable telemetry transport for IoT networks.
-- **Stateless API layer:** easy to scale FastAPI horizontally if needed.
-- **Jobs as separate services:** ingestion / forecasting / alerting can be deployed independently.
-
-### Reliability & Security (Practical Defaults)
-
-- Use MQTT auth + TLS where possible.
-- Validate message schemas server-side (reject missing/invalid fields).
-- Store secrets in `.env` / `config.yaml` and never commit them.
-- Add basic rate limiting to API endpoints if exposed publicly.
+**SolarFlow** — *From order to installation, seamlessly.*
 
 ---
 
-## 📋 Project Summary
 
-**Helios-Solar** is an end-to-end monitoring solution designed to maximize the efficiency of photovoltaic (PV) systems.
-By integrating **real-time sensor data** with **predictive weather modeling**, the platform provides actionable insights into:
 
-- Energy production trends
-- Storage/battery health signals (optional)
-- Consumption patterns and anomalies
 
-Whether you are a researcher analyzing panel degradation or a homeowner optimizing grid usage, Helios-Solar makes energy data **transparent and useful**.
+## 🧑‍🤝‍🧑 User Roles
 
----
-
-## ✨ Features
-
-- 📊 **Real-Time Analytics:** Live dashboard for Voltage (V), Current (A), and Power (W)
-- ☁️ **Weather Integration:** Correlate solar yield with cloud cover and UV index (OpenWeatherMap)
-- 🧠 **ML-Powered Forecasting:** Predict next-day generation using historical data + linear regression
-- 🚨 **Smart Alerts:** Discord/Slack notifications for faults or abnormal efficiency drops
-- 📱 **Mobile Responsive:** Works across desktop, tablet, and mobile
+| Role | Access Level | Key Actions |
+|------|-------------|-------------|
+| **Customer** | Limited | Submit solar installation orders, track order status |
+| **Sales Rep** | Moderate | Review & approve orders, assign crews, manage quotes |
+| **Construction Crew** | Task-based | View assigned jobs, update install progress, mark complete |
+| **Manager** | Full Access | All of the above + resource management, analytics, reporting |
 
 ---
 
-## 🛠️ Technology Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | Python, FastAPI |
-| Frontend | React.js, Tailwind CSS |
-| Database | InfluxDB (time-series) |
-| IoT Connectivity | MQTT, ESP32, Arduino |
-| Data/ML | Pandas, NumPy, Scikit-Learn |
-| Deployment | Docker, Raspberry Pi |
+<img width="554" height="604" alt="Screenshot 2026-04-18 at 2 57 46 AM" src="https://github.com/user-attachments/assets/89321f4f-97c3-4627-9d38-f470a9cfb765" />
+
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui
+- **State Management**: Zustand
+- **Data Fetching**: TanStack Query (React Query)
+- **Forms**: React Hook Form + Zod validation
+- **Maps**: Google Maps API (for installation addresses)
+- **Charts**: Recharts (manager dashboard analytics)
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js (REST API)
+- **Language**: TypeScript
+- **Auth**: JWT + Role-Based Access Control (RBAC)
+- **File Uploads**: Multer + AWS S3 (photos of completed installs)
+
+### Database
+- **Primary DB**: PostgreSQL (relational — orders, users, assignments)
+- **ORM**: Prisma
+- **Cache**: Redis (session management, real-time job queue)
+
+### DevOps & Infrastructure
+- **Containerization**: Docker + Docker Compose
+- **CI/CD**: GitHub Actions
+- **Hosting**: GCP Cloud Run (backend) + Vercel (frontend)
+- **Storage**: GCP Cloud Storage (install photos, documents)
+- **Monitoring**: GCP Cloud Logging + Sentry
 
 ---
 
-## 🔧 Hardware Architecture (Optional)
+## 📁 Project Structure
 
-If your project includes hardware, this section describes a reference setup:
-
-- **Microcontroller:** ESP32 (Wi‑Fi)
-- **Sensors:**
-  - INA219 (current/voltage)
-  - DHT22 (ambient temperature)
-  - LDR (light intensity)
-- **Communication:** MQTT protocol to a local broker (or cloud-hosted broker)
+```
+solarflow/
+├── README.md
+├── docker-compose.yml
+├── .env.example
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+│
+├── frontend/                          # Next.js App
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   ├── public/
+│   │   └── assets/
+│   └── src/
+│       ├── app/                       # Next.js App Router
+│       │   ├── layout.tsx
+│       │   ├── page.tsx               # Landing / redirect
+│       │   ├── (auth)/
+│       │   │   ├── login/page.tsx
+│       │   │   └── register/page.tsx
+│       │   ├── (dashboard)/
+│       │   │   ├── layout.tsx         # Shared dashboard shell
+│       │   │   ├── customer/
+│       │   │   │   ├── page.tsx       # Customer home
+│       │   │   │   ├── orders/
+│       │   │   │   │   ├── page.tsx   # My orders list
+│       │   │   │   │   ├── new/page.tsx # New order form
+│       │   │   │   │   └── [id]/page.tsx # Order detail + status
+│       │   │   │   └── profile/page.tsx
+│       │   │   ├── sales/
+│       │   │   │   ├── page.tsx       # Sales dashboard
+│       │   │   │   ├── orders/
+│       │   │   │   │   ├── page.tsx   # Pending approval queue
+│       │   │   │   │   └── [id]/page.tsx # Review & approve order
+│       │   │   │   ├── assignments/
+│       │   │   │   │   └── page.tsx   # Assign crew to jobs
+│       │   │   │   └── quotes/page.tsx
+│       │   │   ├── crew/
+│       │   │   │   ├── page.tsx       # Crew task board
+│       │   │   │   ├── jobs/
+│       │   │   │   │   ├── page.tsx   # My assigned jobs
+│       │   │   │   │   └── [id]/page.tsx # Job detail + update status
+│       │   │   │   └── schedule/page.tsx
+│       │   │   └── manager/
+│       │   │       ├── page.tsx       # Manager overview
+│       │   │       ├── orders/page.tsx
+│       │   │       ├── crews/
+│       │   │       │   ├── page.tsx   # All crews + availability
+│       │   │       │   └── [id]/page.tsx
+│       │   │       ├── resources/
+│       │   │       │   ├── page.tsx   # Inventory (panels, inverters, etc.)
+│       │   │       │   └── order/page.tsx # Order more resources
+│       │   │       ├── analytics/page.tsx
+│       │   │       └── settings/page.tsx
+│       ├── components/
+│       │   ├── ui/                    # shadcn/ui base components
+│       │   ├── layout/
+│       │   │   ├── Sidebar.tsx
+│       │   │   ├── Topbar.tsx
+│       │   │   └── RoleGuard.tsx      # Route protection by role
+│       │   ├── orders/
+│       │   │   ├── OrderCard.tsx
+│       │   │   ├── OrderForm.tsx
+│       │   │   ├── OrderStatusBadge.tsx
+│       │   │   └── OrderTimeline.tsx
+│       │   ├── jobs/
+│       │   │   ├── JobCard.tsx
+│       │   │   ├── JobStatusUpdater.tsx
+│       │   │   └── InstallPhotoUpload.tsx
+│       │   ├── crew/
+│       │   │   ├── CrewSelector.tsx
+│       │   │   └── CrewAvailabilityCard.tsx
+│       │   ├── resources/
+│       │   │   ├── InventoryTable.tsx
+│       │   │   └── ResourceOrderForm.tsx
+│       │   └── analytics/
+│       │       ├── KPICards.tsx
+│       │       ├── InstallationsChart.tsx
+│       │       └── RevenueChart.tsx
+│       ├── hooks/
+│       │   ├── useAuth.ts
+│       │   ├── useOrders.ts
+│       │   ├── useJobs.ts
+│       │   └── useResources.ts
+│       ├── lib/
+│       │   ├── api.ts                 # Axios instance + interceptors
+│       │   ├── auth.ts
+│       │   └── utils.ts
+│       ├── store/
+│       │   ├── authStore.ts           # Zustand auth state
+│       │   └── notificationStore.ts
+│       └── types/
+│           ├── order.ts
+│           ├── job.ts
+│           ├── user.ts
+│           └── resource.ts
+│
+├── backend/                           # Express.js API
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── Dockerfile
+│   └── src/
+│       ├── server.ts                  # Entry point
+│       ├── app.ts                     # Express setup, middleware
+│       ├── config/
+│       │   ├── database.ts            # Prisma client
+│       │   ├── redis.ts
+│       │   └── gcp.ts                 # GCP Storage client
+│       ├── middleware/
+│       │   ├── auth.middleware.ts     # JWT verification
+│       │   ├── role.middleware.ts     # RBAC guard
+│       │   ├── upload.middleware.ts   # Multer config
+│       │   └── error.middleware.ts
+│       ├── modules/
+│       │   ├── auth/
+│       │   │   ├── auth.router.ts
+│       │   │   ├── auth.controller.ts
+│       │   │   └── auth.service.ts
+│       │   ├── orders/
+│       │   │   ├── orders.router.ts
+│       │   │   ├── orders.controller.ts
+│       │   │   └── orders.service.ts
+│       │   ├── jobs/
+│       │   │   ├── jobs.router.ts
+│       │   │   ├── jobs.controller.ts
+│       │   │   └── jobs.service.ts
+│       │   ├── crews/
+│       │   │   ├── crews.router.ts
+│       │   │   ├── crews.controller.ts
+│       │   │   └── crews.service.ts
+│       │   ├── resources/
+│       │   │   ├── resources.router.ts
+│       │   │   ├── resources.controller.ts
+│       │   │   └── resources.service.ts
+│       │   ├── notifications/
+│       │   │   ├── notifications.router.ts
+│       │   │   └── notifications.service.ts
+│       │   └── analytics/
+│       │       ├── analytics.router.ts
+│       │       └── analytics.service.ts
+│       └── utils/
+│           ├── jwt.ts
+│           ├── email.ts               # Nodemailer (status notifications)
+│           └── logger.ts
+│
+└── database/                          # DB schema & migrations
+    ├── schema.prisma
+    ├── migrations/
+    │   ├── 001_init.sql
+    │   ├── 002_add_resources.sql
+    │   └── 003_add_notifications.sql
+    └── seed/
+        └── seed.ts                    # Dev seed data (roles, demo users)
+```
 
 ---
 
-## 🚀 Getting Started
+## 🗺️ Data Flow
 
-### 1) Installation
+```
+Customer submits order
+    ↓
+Order lands in Sales queue (status: PENDING)
+    ↓
+Sales Rep reviews → Approves + assigns Construction Crew (status: APPROVED)
+    ↓
+Crew sees job on their dashboard → Travels to site → Updates status (IN_PROGRESS)
+    ↓
+Install complete → Crew uploads photo evidence → Marks COMPLETED
+    ↓
+Manager sees real-time analytics, can order more inventory resources
+```
+
+---
+
+## 🔐 Role Permissions Matrix
+
+| Feature | Customer | Sales | Crew | Manager |
+|---------|----------|-------|------|---------|
+| Submit order | ✅ | ✅ | ❌ | ✅ |
+| View own orders | ✅ | ✅ | ❌ | ✅ |
+| Approve/reject orders | ❌ | ✅ | ❌ | ✅ |
+| Assign crew to job | ❌ | ✅ | ❌ | ✅ |
+| View assigned jobs | ❌ | ❌ | ✅ | ✅ |
+| Update job status | ❌ | ❌ | ✅ | ✅ |
+| Upload install photos | ❌ | ❌ | ✅ | ✅ |
+| Manage resources/inventory | ❌ | ❌ | ❌ | ✅ |
+| Order new resources | ❌ | ❌ | ❌ | ✅ |
+| View analytics | ❌ | 🔸 Own | ❌ | ✅ Full |
+| Manage users | ❌ | ❌ | ❌ | ✅ |
+
+---
+
+## 📦 Order Status Lifecycle
+
+```
+DRAFT → PENDING → APPROVED → ASSIGNED → IN_PROGRESS → COMPLETED
+                ↘ REJECTED
+```
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- Node.js 20+
+- Docker & Docker Compose
+- PostgreSQL 15+
+
+### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/rajkandula/Helios-Solar.git
+# Clone the repo
+git clone https://github.com/your-org/solarflow.git
+cd solarflow
 
-# Navigate to the project directory
-cd Helios-Solar
+# Copy env files
+cp .env.example .env
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
 
-# Install Python dependencies
-pip install -r requirements.txt
+# Start services with Docker
+docker-compose up -d
+
+# Install dependencies
+cd frontend && npm install
+cd ../backend && npm install
+
+# Run DB migrations + seed
+cd backend
+npx prisma migrate dev
+npx ts-node src/database/seed/seed.ts
+
+# Start dev servers (in separate terminals)
+# Terminal 1 - Backend
+cd backend && npm run dev        # http://localhost:4000
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev       # http://localhost:3000
 ```
 
-### 2) Configuration
+### Demo Accounts (after seeding)
 
-Create a `config.yaml` or `.env` file (choose one approach and document it in your repo):
+| Role | Email | Password |
+|------|-------|----------|
+| Customer | customer@demo.com | demo1234 |
+| Sales | sales@demo.com | demo1234 |
+| Crew | crew@demo.com | demo1234 |
+| Manager | manager@demo.com | demo1234 |
 
-```yaml
-API_KEY: "your_weather_api_key"
-BROKER_URL: "your_mqtt_broker_ip"
-DB_TOKEN: "your_influxdb_token"
-```
+---
 
-> Tip: Add `config.yaml` / `.env` to `.gitignore`.
+## 🌱 Environment Variables
 
-### 3) Execution
+```env
+# Backend (.env)
+DATABASE_URL=postgresql://user:password@localhost:5432/solarflow
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your_jwt_secret_here
+JWT_EXPIRES_IN=7d
+GCP_PROJECT_ID=your-gcp-project
+GCP_BUCKET_NAME=solarflow-uploads
+AWS_REGION=us-east-1
+SMTP_HOST=smtp.sendgrid.net
+SMTP_USER=apikey
+SMTP_PASS=your_sendgrid_key
+PORT=4000
 
-```bash
-# Start the data ingestion service
-python src/ingest_data.py
-
-# Launch the dashboard
-npm start
+# Frontend (.env.local)
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+NEXT_PUBLIC_GOOGLE_MAPS_KEY=your_maps_key
 ```
 
 ---
 
-## 📈 Roadmap
+## 📡 API Endpoints (Key Routes)
 
-- [ ] **Dual-Axis Support:** Control logic for motorized solar trackers
-- [ ] **Battery Management:** SOC (State of Charge) monitoring for Li-ion storage
-- [ ] **Native App:** Flutter app for iOS/Android
-- [ ] **API Access:** Public endpoints for third-party integrations
+```
+POST   /api/auth/login
+POST   /api/auth/register
+
+GET    /api/orders              → List orders (filtered by role)
+POST   /api/orders              → Create new order (customer)
+PATCH  /api/orders/:id/approve  → Approve order (sales/manager)
+PATCH  /api/orders/:id/reject   → Reject order (sales/manager)
+PATCH  /api/orders/:id/assign   → Assign crew (sales/manager)
+
+GET    /api/jobs                → My jobs (crew) / all jobs (manager)
+PATCH  /api/jobs/:id/status     → Update job status (crew)
+POST   /api/jobs/:id/photos     → Upload install photos (crew)
+
+GET    /api/resources           → Inventory list (manager)
+POST   /api/resources/order     → Order new resources (manager)
+
+GET    /api/analytics/overview  → KPI summary (manager)
+GET    /api/analytics/installs  → Install trends (manager)
+```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome.
-
-1. Fork the project
-2. Create your feature branch: `git checkout -b feature/AmazingFeature`
-3. Commit your changes: `git commit -m "Add AmazingFeature"`
-4. Push to the branch: `git push origin feature/AmazingFeature`
+1. Fork the repo
+2. Create feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m 'feat: add your feature'`
+4. Push to branch: `git push origin feature/your-feature`
 5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+MIT License — see [LICENSE](./LICENSE) for details.
 
 ---
 
-## 👤 Project Lead
-
-**Raj Kandula**
+*Built with ☀️ to make solar accessible for everyone.*
